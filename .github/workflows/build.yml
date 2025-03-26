@@ -19,3 +19,10 @@ jobs:
           gradle-version: wrapper
       - name: Build
         run: gradle build
+      - name: Publish test report
+        uses: mikepenz/action-junit-report@v5
+        if: success() || failure()
+        with:
+          report_paths: '**/build/test-results/test/TEST-*.xml'
+          annotate_notice: true
+          detailed_summary: true
