@@ -70,20 +70,26 @@ public class ConfigurationLoaderImpl<
         }
     }
 
+    private ObjectMapper.Factory createObjectMapperFactoryWithContext(ConfigurationContext context) {
+        return ObjectMapper.factoryBuilder()
+                .addPostProcessor(ContextManager.instance().createFactory(context))
+                .build();
+    }
+
     @SuppressWarnings("unchecked")
     @NotNull
     @Override
     public <S> LoadedConfiguration<S, N> loadWithDefaultAndContext(@NotNull Path path, @NotNull S defaultValue, @NotNull ConfigurationContext context) throws ConfigurateException {
-        ObjectMapper.Factory mapperFactory = ObjectMapper.factoryBuilder()
-                .addPostProcessor(ContextManager.instance().createFactory(context))
-                .build();
         T builder = loaderBuilder.defaultOptions(options ->
                         options.serializers(serializerBuilder ->
-                                serializerBuilder.registerAnnotatedObjects(mapperFactory)))
+                                serializerBuilder.registerAnnotatedObjects(createObjectMapperFactoryWithContext(context))))
                 .path(path);
         L loader = builder.build();
         N loadedNode = loader.load();
-        S object = (S) loadedNode.get(defaultValue.getClass(), defaultValue);
+        if (loadedNode.get(defaultValue.getClass()) == null) {
+            loadedNode.set(defaultValue);
+        }
+        S object = (S) loadedNode.require(defaultValue.getClass());
         return new LoadedConfiguration<>(path, loader, loadedNode, object);
     }
 
@@ -93,7 +99,10 @@ public class ConfigurationLoaderImpl<
     public <S> LoadedConfiguration<S, N> loadWithDefault(@NotNull Path path, @NotNull S defaultValue) throws ConfigurateException {
         L loader = loaderBuilder.path(path).build();
         N loadedNode = loader.load();
-        S object = (S) loadedNode.get(defaultValue.getClass(), defaultValue);
+        if (loadedNode.get(defaultValue.getClass()) == null) {
+            loadedNode.set(defaultValue);
+        }
+        S object = (S) loadedNode.require(defaultValue.getClass());
         return new LoadedConfiguration<>(path, loader, loadedNode, object);
     }
 
@@ -106,12 +115,9 @@ public class ConfigurationLoaderImpl<
     @Override
     public @NotNull <S> LoadedConfiguration<S, N> loadWithResourcesAndContext(@NotNull Path path, @NotNull Class<S> clazz, @NotNull String resourceName, @NotNull ConfigurationContext context) throws ConfigurateException {
         this.copyStreams(path, resourceName);
-        ObjectMapper.Factory mapperFactory = ObjectMapper.factoryBuilder()
-                .addPostProcessor(ContextManager.instance().createFactory(context))
-                .build();
         T builder = loaderBuilder.defaultOptions(options ->
                         options.serializers(serializerBuilder ->
-                                serializerBuilder.registerAnnotatedObjects(mapperFactory)))
+                                serializerBuilder.registerAnnotatedObjects(createObjectMapperFactoryWithContext(context))))
                 .path(path);
         L loader = builder.build();
         N loadedNode = loader.load();
