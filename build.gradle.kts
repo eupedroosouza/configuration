@@ -47,7 +47,7 @@ indraSpotlessLicenser {
 
 publishing {
     repositories {
-        maven("https://mvn.pkg.github.com/eupedroosouza/configuration") {
+        maven("https://maven.pkg.github.com/eupedroosouza/configuration") {
             credentials {
                 username = System.getenv("PACKAGES_REPOSITORY_USERNAME")
                 password = System.getenv("PACKAGES_REPOSITORY_TOKEN")
