@@ -20,8 +20,6 @@ jobs:
         with:
           gradle-version: wrapper
           cache-read-only: true
-      - name: Create release
-        uses:
       - name: Publish
         run: gradle publishToSonatype closeAndReleaseSonatypeStagingRepository
         env:
