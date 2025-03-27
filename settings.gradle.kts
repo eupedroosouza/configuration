@@ -5,9 +5,4 @@ pluginManagement {
         gradlePluginPortal()
         mavenCentral()
     }
-//    includeBuild("gradle/build-logic")
 }
-
-//include(":core")
-//include(":format:yaml", ":format:toml")
-//include(":extras:kotlin")
