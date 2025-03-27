@@ -1,6 +1,7 @@
 [versions]
 # Plugins
 spotless = "3.0.1"
+nexusPublishPlugin = "2.0.0"
 
 # Libraries
 configurate = "4.2.0"
@@ -12,3 +13,4 @@ configurateYaml = { group = "org.spongepowered", name = "configurate-yaml", vers
 
 [plugins]
 spotless = {id = "net.kyori.indra.licenser.spotless", version.ref = "spotless"}
+nexusPublishPlugin = {id = "io.github.gradle-nexus.publish-plugin", version.ref = "nexusPublishPlugin"}

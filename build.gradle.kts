@@ -2,6 +2,8 @@ plugins {
     java
     `java-library`
     `maven-publish`
+    signing
+    alias(libs.plugins.nexusPublishPlugin)
     alias(libs.plugins.spotless)
 }
 
@@ -46,21 +48,60 @@ indraSpotlessLicenser {
 }
 
 publishing {
-    repositories {
-        maven("https://maven.pkg.github.com/eupedroosouza/configuration") {
-            credentials {
-                username = System.getenv("PACKAGES_REPOSITORY_USERNAME")
-                password = System.getenv("PACKAGES_REPOSITORY_TOKEN")
-            }
-        }
-    }
     publications {
         create<MavenPublication>(project.name) {
             from(components["java"])
 
-            groupId = rootProject.group.toString()
-            artifactId = rootProject.name
-            version = rootProject.version.toString()
+            pom {
+                name.set("configuration");
+                description.set("A simple configuration manager using configurate (by SpongePowered)")
+                url.set("https://github.com/eupedroosouza/configuration")
+
+                licenses {
+                    license {
+                        name.set("MIT License")
+                        url.set("http://www.opensource.org/licenses/mit-license.php")
+                    }
+                }
+
+                developers {
+                    developer {
+                        id.set("eupedroosouza")
+                        name.set("Pedro Souza")
+                        email.set("66704494+eupedroosouza@users.noreply.github.com")
+                    }
+                }
+
+                scm {
+                    connection.set("scm:git:git://github.com/eupedroosouza/configuration.git")
+                    developerConnection.set("scm:git:ssh://github.com/eupedroosouza/configuration.git")
+                    url.set("https://github.com/eupedroosouza/configuration")
+                }
+            }
         }
     }
+}
+
+nexusPublishing {
+    repositories {
+        sonatype {
+            nexusUrl.set(uri("https://ossrh-staging-api.central.sonatype.com/service/local/"))
+            snapshotRepositoryUrl.set(uri("https://central.sonatype.com/repository/maven-snapshots/"))
+            username.set(project.findProperty("sonatype.username")?.toString() ?: System.getenv("SONATYPE_USERNAME"))
+            password.set(project.findProperty("sonatype.password")?.toString() ?: System.getenv("SONATYPE_PASSWORD"));
+        }
+    }
+}
+
+signing {
+    val signedKey = project.findProperty("signed.key")?.toString() ?: System.getenv("GPG_SECRET_KEY")
+    val signedPassword = project.findProperty("signed.password")?.toString() ?: System.getenv("GPG_PASSPHRASE")
+
+    if (signedKey != null && signedPassword != null) {
+        useInMemoryPgpKeys(signedKey, signedPassword)
+    } else {
+        useGpgCmd()
+    }
+
+    sign(publishing.publications[project.name])
 }
