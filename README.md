@@ -1,8 +1,12 @@
 # configuration
 A simple configuration manager using [configurate](https://github.com/SpongePowered/Configurate) by [SpongePowered](https://github.com/SpongePowered).
 
-# Use/Install
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/eupedroosouza/configuration/build.yml)
+![GitHub License](https://img.shields.io/github/license/eupedroosouza/configuration)
+![GitHub Release](https://img.shields.io/github/v/release/eupedroosouza/configuration)
 
+# Use/Install
+See all versions available in [releases](https://github.com/eupedroosouza/configuration/releases).
 ### Maven
 ```xml
 <dependencies>
